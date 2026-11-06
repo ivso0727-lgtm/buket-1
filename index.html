@@ -1,0 +1,788 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATELIER FLEUR — 3D Flower Studio</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@300;400;500;600;700&display=swap');
+
+*{box-sizing:border-box}
+body{
+ margin:0;background:#11100f;color:#f5eee4;
+ font-family:Manrope,sans-serif;
+}
+header{
+ height:75px;border-bottom:1px solid #39312b;
+ display:flex;align-items:center;justify-content:space-between;
+ padding:0 5%;background:#151311;
+}
+.logo{font-family:'Cormorant Garamond';font-size:29px;letter-spacing:5px}
+.logo span{color:#c5a36b}
+.header-right{font-size:11px;letter-spacing:3px;color:#b8a995}
+main{max-width:1450px;margin:auto;padding:35px 4%}
+.intro{text-align:center;margin-bottom:30px}
+.eyebrow{font-size:10px;letter-spacing:5px;color:#c5a36b}
+h1{font-family:'Cormorant Garamond';font-size:48px;font-weight:400;margin:8px 0}
+.subtitle{font-size:12px;color:#a99d90;letter-spacing:1px}
+.layout{display:grid;grid-template-columns:300px 1fr;gap:25px}
+.panel{
+ background:#1b1917;border:1px solid #39312b;
+ padding:23px;border-radius:3px;
+}
+.panel h2{font-family:'Cormorant Garamond';font-size:27px;font-weight:400;margin:0 0 18px}
+.section-label{
+ font-size:9px;letter-spacing:3px;color:#b99a68;
+ margin:22px 0 12px;text-transform:uppercase
+}
+.flower-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.flower-btn{
+ border:1px solid #39332d;background:#211e1b;color:#eee2d3;
+ padding:12px 7px;cursor:pointer;text-align:left;
+ font-family:Manrope;font-size:11px;transition:.2s;
+}
+.flower-btn:hover,.flower-btn.active{
+ border-color:#c5a36b;background:#30271f;
+}
+.flower-btn .emoji{font-size:23px;display:block;margin-bottom:6px}
+button{font-family:Manrope}
+.action{
+ width:100%;padding:13px;border:1px solid #b99a68;
+ background:#b99a68;color:#17120e;
+ letter-spacing:2px;font-size:10px;font-weight:700;
+ cursor:pointer;margin-top:10px;transition:.2s
+}
+.action:hover{background:#dfc18c}
+.action.secondary{background:transparent;color:#d7bd94}
+.action.secondary:hover{background:#30271f}
+.counter-row{display:flex;align-items:center;justify-content:space-between}
+.counter-row button{
+ background:#302b26;color:#f5eee4;border:1px solid #54483b;
+ width:35px;height:35px;cursor:pointer;font-size:18px
+}
+.counter-row span{font-size:17px}
+.stage-wrap{min-width:0}
+.stage{
+ height:650px;position:relative;overflow:hidden;
+ background:radial-gradient(ellipse at 50% 45%,#3b3028 0%,#211b17 45%,#11100f 100%);
+ border:1px solid #514235;
+}
+#scene{width:100%;height:100%;display:block}
+.stage-tip{
+ position:absolute;bottom:15px;left:0;right:0;text-align:center;
+ color:#b9a994;font-size:10px;letter-spacing:2px;pointer-events:none;
+}
+.stage-title{
+ position:absolute;top:18px;left:20px;
+ font-size:9px;letter-spacing:3px;color:#c5a36b;
+ pointer-events:none
+}
+.stage-controls{
+ position:absolute;top:14px;right:14px;display:flex;gap:6px
+}
+.stage-controls button{
+ background:#171411cc;border:1px solid #66543d;
+ color:#e5d1ad;padding:8px 11px;font-size:10px;cursor:pointer
+}
+.bottom{
+ display:grid;grid-template-columns:1fr 1fr;gap:25px;margin-top:25px
+}
+.info-box{background:#1b1917;border:1px solid #39312b;padding:20px}
+.info-box h3{font-family:'Cormorant Garamond';font-size:24px;font-weight:400;margin:0 0 12px}
+.muted{font-size:11px;color:#a99d90;line-height:1.8}
+.collection{display:flex;gap:10px;flex-wrap:wrap}
+.saved{
+ border:1px solid #54483b;padding:10px 13px;
+ color:#e5d1ad;background:#211e1b;font-size:11px;cursor:pointer
+}
+.saved:hover{border-color:#c5a36b}
+.empty{font-size:11px;color:#8d8174}
+footer{text-align:center;padding:35px;color:#72665b;font-size:9px;letter-spacing:4px}
+@media(max-width:850px){
+ .layout{grid-template-columns:1fr}
+ .stage{height:540px}
+ .bottom{grid-template-columns:1fr}
+ header{padding:0 4%}
+ .header-right{font-size:8px;letter-spacing:1px}
+ h1{font-size:39px}
+}
+</style>
+</head>
+
+<body>
+<header>
+ <div class="logo">ATELIER <span>FLEUR</span></div>
+ <div class="header-right">THE ART OF FLOWERS · 3D STUDIO</div>
+</header>
+
+<main>
+ <div class="intro">
+  <div class="eyebrow">VIRTUAL FLOWER ATELIER</div>
+  <h1>Создай свою композицию</h1>
+  <div class="subtitle">Каждый цветок — часть твоей истории</div>
+ </div>
+
+ <div class="layout">
+  <aside class="panel">
+   <h2>Мастерская</h2>
+   <div class="section-label">01 / Выбери цветок</div>
+   <div class="flower-grid" id="flowerGrid">
+    <button class="flower-btn active" data-flower="rose"><span class="emoji">🌹</span>Роза</button>
+    <button class="flower-btn" data-flower="peony"><span class="emoji">🌸</span>Пион</button>
+    <button class="flower-btn" data-flower="tulip"><span class="emoji">🌷</span>Тюльпан</button>
+    <button class="flower-btn" data-flower="daisy"><span class="emoji">🌼</span>Ромашка</button>
+    <button class="flower-btn" data-flower="orchid"><span class="emoji">🪷</span>Орхидея</button>
+    <button class="flower-btn" data-flower="hydrangea"><span class="emoji">💐</span>Гортензия</button>
+   </div>
+
+   <div class="section-label">02 / Количество</div>
+   <div class="counter-row">
+    <button id="minus">−</button>
+    <span id="count">1 цветок</span>
+    <button id="plus">+</button>
+   </div>
+   <button class="action" id="add">ДОБАВИТЬ В БУКЕТ</button>
+
+   <div class="section-label">03 / Упаковка</div>
+   <div class="flower-grid">
+    <button class="flower-btn active" data-wrap="cream">Молочная</button>
+    <button class="flower-btn" data-wrap="pink">Пудровая</button>
+    <button class="flower-btn" data-wrap="black">Чёрная</button>
+    <button class="flower-btn" data-wrap="kraft">Крафт</button>
+   </div>
+
+   <div class="section-label">04 / Действия</div>
+   <button class="action" id="save">СОХРАНИТЬ БУКЕТ</button>
+   <button class="action secondary" id="clear">НАЧАТЬ ЗАНОВО</button>
+  </aside>
+
+  <section class="stage-wrap">
+   <div class="stage">
+    <div class="stage-title">ATELIER FLEUR · 3D PREVIEW</div>
+    <div class="stage-controls">
+     <button id="resetView">ВИД СПЕРЕДИ</button>
+     <button id="rotate">АВТОВРАЩЕНИЕ</button>
+    </div>
+    <canvas id="scene"></canvas>
+    <div class="stage-tip">ПЕРЕТАСКИВАЙ ДЛЯ ВРАЩЕНИЯ · КОЛЁСИКО МЫШИ ДЛЯ ПРИБЛИЖЕНИЯ</div>
+   </div>
+  </section>
+ </div>
+
+ <div class="bottom">
+  <div class="info-box">
+   <h3>Твоя композиция</h3>
+   <div class="muted" id="summary">Пока букет пуст. Выбери цветы и добавь их в композицию.</div>
+  </div>
+  <div class="info-box">
+   <h3>Моя коллекция</h3>
+   <div class="collection" id="collection"></div>
+  </div>
+ </div>
+</main>
+
+<footer>ATELIER FLEUR · FLOWERS MADE WITH LOVE</footer>
+
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
+
+const canvas=document.querySelector('#scene');
+const scene=new THREE.Scene();
+scene.background=new THREE.Color('#211b17');
+scene.fog=new THREE.Fog('#211b17',10,22);
+
+const camera=new THREE.PerspectiveCamera(35,1,.1,100);
+camera.position.set(0,4.4,10.5);
+
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.25;
+
+const controls=new OrbitControls(camera,renderer.domElement);
+controls.enableDamping=true;
+controls.dampingFactor=.06;
+controls.target.set(0,2.15,0);
+controls.minDistance=6;
+controls.maxDistance=16;
+controls.maxPolarAngle=Math.PI*.83;
+
+scene.add(new THREE.HemisphereLight(0xffe8d2,0x39251b,2.0));
+
+const keyLight=new THREE.DirectionalLight(0xffe2c0,3.5);
+keyLight.position.set(-4,8,6);
+keyLight.castShadow=true;
+keyLight.shadow.mapSize.set(2048,2048);
+scene.add(keyLight);
+
+const fillLight=new THREE.PointLight(0xffb6a0,65,15);
+fillLight.position.set(4,4,4);
+scene.add(fillLight);
+
+const rimLight=new THREE.PointLight(0xc6a6ff,45,12);
+rimLight.position.set(-4,3,-3);
+scene.add(rimLight);
+
+// Пол
+const floor=new THREE.Mesh(
+ new THREE.CircleGeometry(8,80),
+ new THREE.MeshStandardMaterial({color:0x29221d,roughness:.9})
+);
+floor.rotation.x=-Math.PI/2;
+floor.position.y=-.05;
+floor.receiveShadow=true;
+scene.add(floor);
+
+const colors={
+ rose:0xc51e50,
+ peony:0xe9a4b7,
+ tulip:0xe45a76,
+ daisy:0xf1e6c9,
+ orchid:0xa76bc0,
+ hydrangea:0x7c91d2
+};
+
+const flowerNames={
+ rose:'Роза',peony:'Пион',tulip:'Тюльпан',
+ daisy:'Ромашка',orchid:'Орхидея',hydrangea:'Гортензия'
+};
+
+let bouquet=[];
+let selected='rose';
+let amount=1;
+let wrapType='cream';
+let bouquetGroup=new THREE.Group();
+scene.add(bouquetGroup);
+
+let autoRotate=false;
+
+// Материалы
+function mat(color,roughness=.55,metalness=0){
+ return new THREE.MeshStandardMaterial({
+  color,roughness,metalness,side:THREE.DoubleSide
+ });
+}
+
+// Геометрия лепестка с объёмом и изгибом
+function makePetalGeometry(length,width,curve=.25){
+ const positions=[],uvs=[],indices=[];
+ const rows=14,cols=12;
+ for(let i=0;i<=rows;i++){
+  const v=i/rows;
+  for(let j=0;j<=cols;j++){
+   const u=j/cols;
+   const shape=Math.pow(Math.sin(Math.PI*v),.75);
+   const x=(u-.5)*width*shape;
+   const y=v*length;
+   const z=curve*Math.sin(Math.PI*v)+
+     .16*Math.pow(Math.abs(u-.5)*2,2)*shape;
+   positions.push(x,y,z);
+   uvs.push(u,v);
+  }
+ }
+ for(let i=0;i<rows;i++){
+  for(let j=0;j<cols;j++){
+   const a=i*(cols+1)+j;
+   const b=a+cols+1;
+   indices.push(a,b,a+1,b,b+1,a+1);
+  }
+ }
+ const g=new THREE.BufferGeometry();
+ g.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));
+ g.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2));
+ g.setIndex(indices);
+ g.computeVertexNormals();
+ return g;
+}
+
+function addPetal(group,geometry,material,x,y,z,angle,scale=1,tilt=0){
+ const mesh=new THREE.Mesh(geometry,material);
+ mesh.position.set(x,y,z);
+ mesh.rotation.set(tilt,0,angle);
+ mesh.scale.setScalar(scale);
+ mesh.castShadow=true;
+ mesh.receiveShadow=true;
+ group.add(mesh);
+ return mesh;
+}
+
+// Стебель из изогнутой кривой
+function addStem(group,start,end,radius=.025){
+ const curve=new THREE.CatmullRomCurve3([
+  new THREE.Vector3(...start),
+  new THREE.Vector3(start[0]+.12,start[1]+.65,start[2]),
+  new THREE.Vector3(end[0]-.06,end[1]-.6,end[2]),
+  new THREE.Vector3(...end)
+ ]);
+ const mesh=new THREE.Mesh(
+  new THREE.TubeGeometry(curve,28,radius,8,false),
+  mat(0x315a38,.8)
+ );
+ mesh.castShadow=true;
+ group.add(mesh);
+}
+
+// Лист
+function addLeaf(group,x,y,z,angle,scale=1){
+ const g=makePetalGeometry(.75,.35,.12);
+ const m=new THREE.Mesh(g,mat(0x47754b,.65));
+ m.position.set(x,y,z);
+ m.rotation.set(-.35,0,angle);
+ m.scale.setScalar(scale);
+ m.castShadow=true;
+ group.add(m);
+ const vein=new THREE.Mesh(
+  new THREE.CylinderGeometry(.006,.009,.5,5),
+  mat(0x9ab27b)
+ );
+ vein.position.set(x,y+.25,z+.03);
+ vein.rotation.z=angle;
+ group.add(vein);
+}
+
+// Центр цветка
+function addCenter(group,color,size=.11){
+ const center=new THREE.Mesh(
+  new THREE.SphereGeometry(size,20,16),
+  mat(color,.45)
+ );
+ center.castShadow=true;
+ group.add(center);
+ return center;
+}
+
+function createFlower(type,x,y,z,scale=1){
+ const group=new THREE.Group();
+ group.position.set(x,y,z);
+ group.scale.setScalar(scale);
+
+ const color=colors[type];
+ const base=new THREE.Color(color);
+ const petalGeo=makePetalGeometry(.62,.36,.25);
+
+ if(type==='rose'){
+  for(let layer=0;layer<5;layer++){
+   const count=6+layer*2;
+   const radius=.04+layer*.105;
+   for(let i=0;i<count;i++){
+    const angle=i/count*Math.PI*2+layer*.45;
+    const c=base.clone().multiplyScalar(.78+Math.random()*.35);
+    const material=mat(c,.36);
+    const p=addPetal(
+     group,petalGeo,material,
+     Math.cos(angle)*radius,
+     Math.sin(angle)*radius,
+     layer*.018,
+     -angle+Math.PI/2,
+     .52+layer*.12,
+     .1
+    );
+   }
+  }
+  addCenter(group,0x6c102d,.075);
+ }
+ else if(type==='peony'){
+  for(let layer=0;layer<4;layer++){
+   const count=10+layer*4;
+   const radius=.03+layer*.12;
+   for(let i=0;i<count;i++){
+    const a=i/count*Math.PI*2+layer*.23;
+    const c=base.clone().multiplyScalar(.82+Math.random()*.3);
+    addPetal(group,petalGeo,mat(c,.42),
+     Math.cos(a)*radius,Math.sin(a)*radius,layer*.025,
+     -a+Math.PI/2,.85+Math.random()*.18,.12);
+   }
+  }
+  addCenter(group,0xd99a45,.12);
+ }
+ else if(type==='tulip'){
+  for(let i=0;i<6;i++){
+   const a=i/6*Math.PI*2;
+   addPetal(group,petalGeo,mat(base.clone().multiplyScalar(.85+Math.random()*.25),.32),
+    Math.cos(a)*.12,Math.sin(a)*.12,0,
+    -a+Math.PI/2,1.1,.35);
+  }
+  addCenter(group,0x4c2c25,.055);
+ }
+ else if(type==='daisy'){
+  for(let i=0;i<18;i++){
+   const a=i/18*Math.PI*2;
+   const g=makePetalGeometry(.65,.17,.12);
+   addPetal(group,g,mat(0xfff1d7,.42),
+    Math.cos(a)*.22,Math.sin(a)*.22,0,
+    -a+Math.PI/2,.8,.05);
+  }
+  addCenter(group,0xe5a72c,.18);
+  for(let i=0;i<30;i++){
+   const a=Math.random()*Math.PI*2;
+   const r=Math.random()*.14;
+   const dot=new THREE.Mesh(
+    new THREE.SphereGeometry(.012,6,6),
+    mat(0x7a4518)
+   );
+   dot.position.set(Math.cos(a)*r,Math.sin(a)*r,.17);
+   group.add(dot);
+  }
+ }
+ else if(type==='orchid'){
+  for(let i=0;i<5;i++){
+   const a=i/5*Math.PI*2;
+   addPetal(group,makePetalGeometry(.72,.4,.2),
+    mat(base.clone().multiplyScalar(.8+Math.random()*.3),.3),
+    Math.cos(a)*.08,Math.sin(a)*.08,0,
+    -a+Math.PI/2,1.1,.25);
+  }
+  addCenter(group,0xe9c3e7,.16);
+  const lip=new THREE.Mesh(
+   new THREE.SphereGeometry(.14,16,12),
+   mat(0xf0c65b,.3)
+  );
+  lip.position.set(0,-.1,.13);
+  lip.scale.set(1,.7,.6);
+  group.add(lip);
+ }
+ else if(type==='hydrangea'){
+  for(let i=0;i<25;i++){
+   const a=Math.random()*Math.PI*2;
+   const r=Math.sqrt(Math.random())*.42;
+   const small=new THREE.Mesh(
+    new THREE.SphereGeometry(.115,12,10),
+    mat(base.clone().multiplyScalar(.78+Math.random()*.45),.4)
+   );
+   small.position.set(Math.cos(a)*r,Math.sin(a)*r,Math.random()*.16);
+   small.scale.set(1,1,.75);
+   small.castShadow=true;
+   group.add(small);
+   const middle=new THREE.Mesh(
+    new THREE.SphereGeometry(.035,8,8),
+    mat(0xf0d6e5)
+   );
+   middle.position.set(small.position.x,small.position.y,small.position.z+.08);
+   group.add(middle);
+  }
+ }
+
+ // Чашелистики
+ for(let i=0;i<5;i++){
+  const a=i/5*Math.PI*2;
+  const leaf=new THREE.Mesh(
+   makePetalGeometry(.38,.12,.05),
+   mat(0x315c39)
+  );
+  leaf.position.set(Math.cos(a)*.05,Math.sin(a)*.05,-.12);
+  leaf.rotation.z=-a;
+  leaf.rotation.x=.5;
+  group.add(leaf);
+ }
+
+ return group;
+}
+
+// Объёмная упаковка
+function createWrapping(group){
+ const wrapColors={
+  cream:0xe8d9c5,
+  pink:0xd69ca8,
+  black:0x292526,
+  kraft:0x9c7650
+ };
+ const color=wrapColors[wrapType];
+
+ // Основной конус упаковки
+ const geometry=new THREE.BufferGeometry();
+ const verts=[],indices=[];
+ const segments=64,levels=12;
+ for(let j=0;j<=levels;j++){
+  const v=j/levels;
+  for(let i=0;i<=segments;i++){
+   const a=i/segments*Math.PI*2;
+   const radius=.34+v*.95;
+   const height=.25+v*2.0;
+   verts.push(Math.cos(a)*radius,height,Math.sin(a)*radius);
+  }
+ }
+ for(let j=0;j<levels;j++){
+  for(let i=0;i<segments;i++){
+   const a=j*(segments+1)+i;
+   const b=a+segments+1;
+   indices.push(a,a+1,b,a+1,b+1,b);
+  }
+ }
+ geometry.setAttribute('position',new THREE.Float32BufferAttribute(verts,3));
+ geometry.setIndex(indices);
+ geometry.computeVertexNormals();
+
+ const paper=new THREE.Mesh(
+  geometry,
+  new THREE.MeshStandardMaterial({
+   color,roughness:.7,side:THREE.DoubleSide
+  })
+ );
+ paper.castShadow=true;
+ paper.receiveShadow=true;
+ group.add(paper);
+
+ // Дополнительные раскрытые уголки бумаги
+ for(let i=0;i<4;i++){
+  const angle=i*Math.PI/2+.4;
+  const corner=new THREE.Mesh(
+   new THREE.ConeGeometry(.7,1.6,4,1,true),
+   new THREE.MeshStandardMaterial({
+    color,roughness:.75,side:THREE.DoubleSide
+   })
+  );
+  corner.position.set(
+   Math.cos(angle)*.55,1.8,Math.sin(angle)*.55
+  );
+  corner.rotation.z=-.18;
+  corner.rotation.y=angle;
+  corner.scale.set(.8,1,.35);
+  group.add(corner);
+ }
+
+ // Лента вокруг букета
+ const ribbonMat=mat(0xb18a4d,.3,.55);
+ const ribbon=new THREE.Mesh(
+  new THREE.TorusGeometry(.44,.045,12,64),
+  ribbonMat
+ );
+ ribbon.position.set(0,1.02,0);
+ ribbon.rotation.x=Math.PI/2;
+ group.add(ribbon);
+
+ // Бант
+ for(let side of [-1,1]){
+  const loop=new THREE.Mesh(
+   new THREE.TorusGeometry(.22,.055,12,32,.95*Math.PI),
+   ribbonMat
+  );
+  loop.position.set(side*.2,1.12,.1);
+  loop.rotation.z=side===-1?-.5:Math.PI+.5;
+  loop.rotation.x=.4;
+  group.add(loop);
+ }
+ const knot=new THREE.Mesh(
+  new THREE.SphereGeometry(.105,16,12),
+  ribbonMat
+ );
+ knot.position.set(0,1.1,.17);
+ knot.scale.set(1,.8,.6);
+ group.add(knot);
+
+ // Хвосты банта
+ for(let side of [-1,1]){
+  const tail=new THREE.Mesh(
+   new THREE.BoxGeometry(.1,.75,.035),
+   ribbonMat
+  );
+  tail.position.set(side*.15,.7,.12);
+  tail.rotation.z=side*.25;
+  group.add(tail);
+ }
+}
+
+// Создание букета
+function renderBouquet(){
+ bouquetGroup.clear();
+
+ if(bouquet.length===0){
+  // Пустая сцена — декоративная подставка
+  updateSummary();
+  return;
+ }
+
+ const total=bouquet.length;
+ const positions=[];
+
+ for(let i=0;i<total;i++){
+  const angle=i*2.399;
+  const radius=.12+Math.sqrt(i)*.19;
+  positions.push({
+   x:Math.cos(angle)*radius,
+   z:Math.sin(angle)*radius*.45,
+   y:2.65+Math.random()*.6
+  });
+ }
+
+ // Стебли и листья
+ positions.forEach((p,i)=>{
+  const bottom=[p.x*.35,.15,p.z*.3];
+  const top=[p.x,p.y-.15,p.z];
+  addStem(bouquetGroup,bottom,top,.025);
+  addLeaf(bouquetGroup,p.x*.6,.85+i*.025,p.z*.5,i*1.7,.75);
+  addLeaf(bouquetGroup,p.x*.75,1.35+i*.02,p.z*.6,i*2.1,.65);
+ });
+
+ // Упаковка позади цветов
+ createWrapping(bouquetGroup);
+
+ // Цветы поверх упаковки
+ positions.forEach((p,i)=>{
+  const type=bouquet[i];
+  const flower=createFlower(type,p.x,p.y,p.z,.72+Math.random()*.16);
+  bouquetGroup.add(flower);
+ });
+
+ updateSummary();
+}
+
+// Счётчик
+function updateCounter(){
+ document.querySelector('#count').textContent=
+  amount+' '+(amount===1?'цветок':amount<5?'цветка':'цветков');
+}
+document.querySelector('#plus').onclick=()=>{
+ amount=Math.min(20,amount+1);updateCounter();
+};
+document.querySelector('#minus').onclick=()=>{
+ amount=Math.max(1,amount-1);updateCounter();
+};
+
+// Выбор цветка
+document.querySelectorAll('[data-flower]').forEach(btn=>{
+ btn.onclick=()=>{
+  document.querySelectorAll('[data-flower]').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  selected=btn.dataset.flower;
+ };
+});
+
+// Упаковка
+document.querySelectorAll('[data-wrap]').forEach(btn=>{
+ btn.onclick=()=>{
+  document.querySelectorAll('[data-wrap]').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  wrapType=btn.dataset.wrap;
+  renderBouquet();
+ };
+});
+
+// Добавить цветы
+document.querySelector('#add').onclick=()=>{
+ if(bouquet.length+amount>30){
+  alert('В букете может быть максимум 30 цветов');
+  return;
+ }
+ for(let i=0;i<amount;i++) bouquet.push(selected);
+ renderBouquet();
+};
+
+// Очистить
+document.querySelector('#clear').onclick=()=>{
+ bouquet=[];
+ renderBouquet();
+};
+
+// Информация
+function updateSummary(){
+ const counts={};
+ bouquet.forEach(t=>counts[t]=(counts[t]||0)+1);
+ const text=Object.entries(counts)
+  .map(([type,n])=>flowerNames[type]+': '+n)
+  .join(' · ');
+ document.querySelector('#summary').textContent=
+  bouquet.length
+   ? 'Всего цветов: '+bouquet.length+'. '+text+'.'
+   : 'Пока букет пуст. Выбери цветы и добавь их в композицию.';
+}
+
+// Сохранение
+function getSaved(){
+ try{return JSON.parse(localStorage.getItem('atelier3D')||'[]')}
+ catch{return []}
+}
+function saveBouquet(){
+ if(!bouquet.length){
+  alert('Сначала добавь цветы в букет');
+  return;
+ }
+ const name=prompt('Как назовём этот букет?','Моя композиция');
+ if(!name)return;
+ const saved=getSaved();
+ saved.push({
+  id:Date.now(),
+  name,
+  flowers:[...bouquet],
+  wrap:wrapType,
+  date:new Date().toLocaleDateString('ru-RU')
+ });
+ localStorage.setItem('atelier3D',JSON.stringify(saved));
+ showCollection();
+ alert('Букет сохранён в коллекцию!');
+}
+document.querySelector('#save').onclick=saveBouquet;
+
+function showCollection(){
+ const root=document.querySelector('#collection');
+ const saved=getSaved();
+ root.innerHTML='';
+ if(!saved.length){
+  root.innerHTML='<div class="empty">Здесь появятся твои букеты.</div>';
+  return;
+ }
+ saved.forEach(item=>{
+  const btn=document.createElement('button');
+  btn.className='saved';
+  btn.textContent='✿ '+item.name+' · '+item.flowers.length;
+  btn.onclick=()=>{
+   bouquet=[...item.flowers];
+   wrapType=item.wrap;
+   document.querySelectorAll('[data-wrap]').forEach(b=>{
+    b.classList.toggle('active',b.dataset.wrap===wrapType);
+   });
+   renderBouquet();
+  };
+  btn.oncontextmenu=(e)=>{
+   e.preventDefault();
+   if(confirm('Удалить '+item.name+'?')){
+    const updated=getSaved().filter(x=>x.id!==item.id);
+    localStorage.setItem('atelier3D',JSON.stringify(updated));
+    showCollection();
+   }
+  };
+  root.appendChild(btn);
+ });
+}
+showCollection();
+
+// Камера
+document.querySelector('#resetView').onclick=()=>{
+ camera.position.set(0,4.4,10.5);
+ controls.target.set(0,2.15,0);
+ controls.update();
+};
+document.querySelector('#rotate').onclick=()=>{
+ autoRotate=!autoRotate;
+ document.querySelector('#rotate').textContent=
+  autoRotate?'ОСТАНОВИТЬ':'АВТОВРАЩЕНИЕ';
+};
+
+// Адаптация размера
+function resize(){
+ const w=canvas.clientWidth;
+ const h=canvas.clientHeight;
+ camera.aspect=w/h;
+ camera.updateProjectionMatrix();
+ renderer.setSize(w,h,false);
+}
+new ResizeObserver(resize).observe(canvas);
+resize();
+
+// Анимация
+function animate(){
+ requestAnimationFrame(animate);
+ if(autoRotate) bouquetGroup.rotation.y+=.003;
+ controls.update();
+ renderer.render(scene,camera);
+}
+animate();
+
+</script>
+</body>
+</html>
